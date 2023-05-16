@@ -31,8 +31,7 @@ router
       const validate = validationSchema.validate(req.body);
 
       if (!isNil(validate.error)) {
-        res.status(400).send(validate.error.message);
-        return;
+        return res.status(400).send(validate.error.message);
       }
 
       const { title, content, authorId } = req.body;
@@ -46,17 +45,51 @@ router
     }
   });
 
-router.post("/:id/like", async (req, res) => {
+router.get("/author/:id", async (req, res) => {
   try {
+    const validationSchema = Joi.object().keys({
+      id: Joi.string().required(),
+    });
+
+    const validate = validationSchema.validate(req.params);
+
+    if (!isNil(validate.error)) {
+      return res.status(400).send(validate.error.message);
+    }
+
     const { id } = req.params;
 
-    const { authorization } = req.headers;
-    const userId = getUserId(authorization);
+    const posts = await postService.getPostsByAuthorId(id);
+
+    const data = { posts };
+
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+router.post("/like/:id", async (req, res) => {
+  try {
+    const validationSchema = Joi.object().keys({
+      id: Joi.string().required(),
+    });
+
+    const validate = validationSchema.validate(req.params);
+
+    if (!isNil(validate.error)) {
+      return res.status(400).send(validate.error.message);
+    }
+
+    const { id } = req.params;
+    const userId = getUserId(req.headers.authorization);
 
     const likeExists = await postService.fetchLike(id, userId);
 
     if (likeExists) {
-      res.status(400).send("Like already exists");
+      return res.status(400).send({
+        message: "Like already exists.",
+      });
     }
 
     const like = await postService.likePost(id, userId);
@@ -69,12 +102,20 @@ router.post("/:id/like", async (req, res) => {
   }
 });
 
-router.delete("/:id/unlike", async (req, res) => {
+router.delete("/unlike/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const validationSchema = Joi.object().keys({
+      id: Joi.string().required(),
+    });
 
-    const { authorization } = req.headers;
-    const userId = getUserId(authorization);
+    const validate = validationSchema.validate(req.params);
+
+    if (!isNil(validate.error)) {
+      return res.status(400).send(validate.error.message);
+    }
+
+    const { id } = req.params;
+    const userId = getUserId(req.headers.authorization);
 
     const isDeleted = await postService.unlikePost(id, userId);
 
@@ -86,24 +127,20 @@ router.delete("/:id/unlike", async (req, res) => {
   }
 });
 
-router.get("/:authorId", async (req, res) => {
-  try {
-    const { authorId } = req.params;
-
-    const posts = await postService.getPostsByAuthorId(authorId);
-
-    const data = { posts };
-
-    res.status(200).send(data);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
 router
   .route("/:id")
   .get(async (req, res) => {
     try {
+      const validationSchema = Joi.object().keys({
+        id: Joi.string().required(),
+      });
+
+      const validate = validationSchema.validate(req.params);
+
+      if (!isNil(validate.error)) {
+        return res.status(400).send(validate.error.message);
+      }
+
       const { id } = req.params;
 
       const post = await postService.getPostById(id);
@@ -125,8 +162,7 @@ router
       const validate = validationSchema.validate(req.body);
 
       if (!isNil(validate.error)) {
-        res.status(400).send(validate.error.message);
-        return;
+        return res.status(400).send(validate.error.message);
       }
 
       const { id } = req.params;

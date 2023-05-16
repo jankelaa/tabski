@@ -5,18 +5,30 @@ let instance = null;
 
 class PostService {
   async getAllPosts() {
-    const query = "SELECT * FROM posts";
+    const query = `SELECT p.*, COUNT (l.*) AS likes
+    FROM posts AS p
+    LEFT JOIN likes AS l ON p.id = l."postId"
+    GROUP BY p.id;`;
+
     return (await pool.query(query)).rows;
   }
 
   async getPostById(id) {
-    const query = "SELECT * FROM posts WHERE id = $1";
+    const query = `SELECT p.*, COUNT (l.*) AS likes
+    FROM posts AS p
+    LEFT JOIN likes AS l ON p.id = l."postId"
+    WHERE p.id = $1
+    GROUP BY p.id;`;
     const res = await pool.query(query, [id]);
     return res.rows[0];
   }
 
   async getPostsByAuthorId(authorId) {
-    const query = `SELECT * FROM posts WHERE "authorId" = $1`;
+    const query = `SELECT p.*, COUNT (l.*) AS likes
+    FROM posts AS p
+    LEFT JOIN likes AS l ON p.id = l."postId"
+    WHERE p."authorId" = $1
+    GROUP BY p.id;`;
     return (await pool.query(query, [authorId])).rows;
   }
 

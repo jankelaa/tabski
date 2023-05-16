@@ -33,8 +33,7 @@ router
       const validate = validationSchema.validate(req.body);
 
       if (!isNil(validate.error)) {
-        res.status(400).send(validate.error.message);
-        return;
+        return res.status(400).send(validate.error.message);
       }
 
       const { name, email, password } = req.body;
@@ -52,6 +51,16 @@ router
   .route("/:id")
   .get(async (req, res) => {
     try {
+      const validationSchema = Joi.object().keys({
+        id: Joi.string().required(),
+      });
+
+      const validate = validationSchema.validate(req.params);
+
+      if (!isNil(validate.error)) {
+        return res.status(400).send(validate.error.message);
+      }
+
       const { id } = req.params;
 
       const user = await userService.getUserById(id);
@@ -74,8 +83,7 @@ router
       const validate = validationSchema.validate(req.body);
 
       if (!isNil(validate.error)) {
-        res.status(400).send(validate.error.message);
-        return;
+        return res.status(400).send(validate.error.message);
       }
 
       const { id } = req.params;
