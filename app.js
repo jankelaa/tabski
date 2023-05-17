@@ -19,7 +19,9 @@ app.get("/", (req, res) => {
   res.send(`Listening on port ${PORT}`);
 });
 
-app.listen(PORT, (error) => {
+const server = app.listen(PORT, (error) => {
   if (!error) console.log("Server is running and listening on port " + PORT);
   else console.log("Error occurred, server can't start", error);
 });
+
+module.exports = server;
