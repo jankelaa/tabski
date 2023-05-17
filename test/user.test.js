@@ -48,24 +48,24 @@ describe("CREATE UPDATE and DELETE the user", () => {
   it("Endpoint should update the user", async () => {
     const updatedName = "Marko";
 
-    const updateUserResponse = await request(app).put(`/user/${userId}`).send({
+    const response = await request(app).put(`/user/${userId}`).send({
       name: updatedName,
       email: "janko3@janko.com",
       password: "password123",
     });
 
-    expect(updateUserResponse.status).to.equal(200);
-    expect(updateUserResponse.body.user).to.be.an("object");
-    expect(updateUserResponse.body.user).to.have.property("id");
-    expect(updateUserResponse.body.user.name).to.equal(updatedName);
+    expect(response.status).to.equal(200);
+    expect(response.body.user).to.be.an("object");
+    expect(response.body.user).to.have.property("id");
+    expect(response.body.user.name).to.equal(updatedName);
   });
 
   it("Endpoint should delete the user", async () => {
-    const deleteUserResponse = await request(app).delete(`/user/${userId}`);
+    const response = await request(app).delete(`/user/${userId}`);
 
-    expect(deleteUserResponse.status).to.equal(200);
-    expect(deleteUserResponse.body).to.be.an("object");
-    expect(deleteUserResponse.body).to.have.property("isDeleted");
-    expect(deleteUserResponse.body.isDeleted).to.equal(true);
+    expect(response.status).to.equal(200);
+    expect(response.body).to.be.an("object");
+    expect(response.body).to.have.property("isDeleted");
+    expect(response.body.isDeleted).to.equal(true);
   });
 });
